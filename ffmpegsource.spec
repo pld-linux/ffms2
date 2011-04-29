@@ -1,12 +1,14 @@
 Summary:	FFmpegSource - FFmpeg wrapper library
 Summary(pl.UTF-8):	FFmpegSource - biblioteka obudowująca FFmpeg
 Name:		ffmpegsource
-Version:	2.14
+Version:	2.15
 Release:	1
 License:	MIT (ffmpegsource itself), GPL v3+ (forced by ffmpeg)
 Group:		Libraries
+#Source0Download: http://code.google.com/p/ffmpegsource/downloads/list
 Source0:	http://ffmpegsource.googlecode.com/files/%{name}-%{version}_src.7z
-# Source0-md5:	59e7d09a4c8af57a7907b2ec58b9f249
+# Source0-md5:	0d0e2d4f6c4424e5f182f40f451c064e
+Patch0:		%{name}-c++.patch
 URL:		http://code.google.com/p/ffmpegsource/
 BuildRequires:	autoconf >= 2.58
 BuildRequires:	automake
@@ -67,7 +69,8 @@ Statyczna biblioteka FFmpegSource.
 %prep
 %setup -q -c -T -n %{name}-%{version}_src
 7z -o.. x %{SOURCE0}
-
+%undos src/core/utils.cpp
+%patch0 -p1
 %{__rm} configure
 
 %build

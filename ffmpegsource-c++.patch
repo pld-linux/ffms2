@@ -1,0 +1,11 @@
+--- ffmpegsource-2.15_src/src/core/utils.cpp.orig	2011-02-12 01:33:57.000000000 +0100
++++ ffmpegsource-2.15_src/src/core/utils.cpp	2011-04-29 19:00:44.272480825 +0200
+@@ -230,7 +230,7 @@
+ template<class T> static void safe_aligned_reallocz(T *&ptr, size_t old_size, size_t new_size) {
+ 	void *newalloc = av_mallocz(new_size);
+ 	if (newalloc) {
+-		memcpy(newalloc, ptr, min(old_size, new_size));
++		memcpy(newalloc, ptr, std::min(old_size, new_size));
+ 	}
+ 	av_free(ptr);
+ 	ptr = static_cast<T*>(newalloc);
