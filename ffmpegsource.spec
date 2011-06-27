@@ -2,7 +2,7 @@ Summary:	FFmpegSource - FFmpeg wrapper library
 Summary(pl.UTF-8):	FFmpegSource - biblioteka obudowująca FFmpeg
 Name:		ffmpegsource
 Version:	2.15
-Release:	2
+Release:	3
 License:	MIT (ffmpegsource itself), GPL v3+ (forced by ffmpeg)
 Group:		Libraries
 #Source0Download: http://code.google.com/p/ffmpegsource/downloads/list
