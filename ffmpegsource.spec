@@ -2,21 +2,24 @@ Summary:	FFmpegSource - FFmpeg wrapper library
 Summary(pl.UTF-8):	FFmpegSource - biblioteka obudowująca FFmpeg
 Name:		ffmpegsource
 Version:	2.15
-Release:	1
+Release:	2
 License:	MIT (ffmpegsource itself), GPL v3+ (forced by ffmpeg)
 Group:		Libraries
 #Source0Download: http://code.google.com/p/ffmpegsource/downloads/list
 Source0:	http://ffmpegsource.googlecode.com/files/%{name}-%{version}_src.7z
 # Source0-md5:	0d0e2d4f6c4424e5f182f40f451c064e
 Patch0:		%{name}-c++.patch
+Patch1:		%{name}-ffmpeg-0.8.patch
 URL:		http://code.google.com/p/ffmpegsource/
 BuildRequires:	autoconf >= 2.58
 BuildRequires:	automake
-BuildRequires:	ffmpeg-devel >= 0.5.0
+BuildRequires:	ffmpeg-devel >= 0.8.0
 BuildRequires:	libstdc++-devel
 BuildRequires:	libtool >= 2:2.0
 BuildRequires:	p7zip
 BuildRequires:	pkgconfig >= 1:0.22
+BuildRequires:	rpmbuild(macros) >= 1.566
+BuildRequires:	sed >= 4.0
 BuildRequires:	zlib-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -44,7 +47,7 @@ Summary:	Header files for FFmpegSource library
 Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki FFmpegSource
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
-Requires:	ffmpeg-devel >= 0.5.0
+Requires:	ffmpeg-devel >= 0.8.0
 Requires:	libstdc++-devel
 Requires:	zlib-devel
 
@@ -69,8 +72,9 @@ Statyczna biblioteka FFmpegSource.
 %prep
 %setup -q -c -T -n %{name}-%{version}_src
 7z -o.. x %{SOURCE0}
-%undos src/core/utils.cpp
+%undos src/core/{indexing,lavfindexer,utils}.cpp
 %patch0 -p1
+%patch1 -p1
 %{__rm} configure
 
 %build
