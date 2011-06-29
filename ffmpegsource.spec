@@ -13,7 +13,7 @@ Patch1:		%{name}-ffmpeg-0.8.patch
 URL:		http://code.google.com/p/ffmpegsource/
 BuildRequires:	autoconf >= 2.58
 BuildRequires:	automake
-BuildRequires:	ffmpeg-devel >= 0.8.0
+BuildRequires:	ffmpeg-devel >= 0.8
 BuildRequires:	libstdc++-devel
 BuildRequires:	libtool >= 2:2.0
 BuildRequires:	p7zip
@@ -47,7 +47,7 @@ Summary:	Header files for FFmpegSource library
 Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki FFmpegSource
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
-Requires:	ffmpeg-devel >= 0.8.0
+Requires:	ffmpeg-devel >= 0.8
 Requires:	libstdc++-devel
 Requires:	zlib-devel
 
