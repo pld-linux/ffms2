@@ -1,17 +1,18 @@
 Summary:	FFmpegSource - FFmpeg wrapper library
 Summary(pl.UTF-8):	FFmpegSource - biblioteka obudowująca FFmpeg
 Name:		ffmpegsource
-Version:	2.16
+Version:	2.16.2.1
 Release:	1
 License:	MIT (ffmpegsource itself), GPL v3+ (forced by ffmpeg)
 Group:		Libraries
 #Source0Download: http://code.google.com/p/ffmpegsource/downloads/list
-Source0:	http://ffmpegsource.googlecode.com/files/ffms-%{version}-src.tar.bz2
-# Source0-md5:	de5d8a4ba7b9920fa5cc290b012bbbf0
+#Source0:	http://ffmpegsource.googlecode.com/files/ffms-%{version}-src.tar.bz2
+Source0:	http://rion-overlay.googlecode.com/files/ffmpegsource-2.16.2.1_pre587.tar.xz
+# Source0-md5:	9eb026ed80d3c551662baabee3906f0c
 URL:		http://code.google.com/p/ffmpegsource/
 BuildRequires:	autoconf >= 2.58
 BuildRequires:	automake
-BuildRequires:	ffmpeg-devel >= 0.8
+BuildRequires:	ffmpeg-devel >= 0.9
 BuildRequires:	libstdc++-devel
 BuildRequires:	libtool >= 2:2.0
 BuildRequires:	p7zip
@@ -45,7 +46,7 @@ Summary:	Header files for FFmpegSource library
 Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki FFmpegSource
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
-Requires:	ffmpeg-devel >= 0.8
+Requires:	ffmpeg-devel >= 0.9
 Requires:	libstdc++-devel
 Requires:	zlib-devel
 
@@ -68,7 +69,7 @@ Static FFmpegSource library.
 Statyczna biblioteka FFmpegSource.
 
 %prep
-%setup -q -n ffms-%{version}-src
+%setup -q -n %{name}-%{version}_pre587
 %undos src/core/{indexing,lavfindexer,utils}.cpp
 %{__rm} configure
 
