@@ -11,6 +11,7 @@ Source0:	http://ffmpegsource.googlecode.com/files/ffms-%{version}-src.tar.bz2
 URL:		http://code.google.com/p/ffmpegsource/
 BuildRequires:	autoconf >= 2.58
 BuildRequires:	automake
+# libavformat >= 52.64.2 libavcodec >= 52.72.0 libswscale >= 0.7.0 libavutil >= 50.15.1
 BuildRequires:	ffmpeg-devel >= 0.9
 BuildRequires:	libstdc++-devel
 BuildRequires:	libtool >= 2:2.0
