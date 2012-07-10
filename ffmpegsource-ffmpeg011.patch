@@ -1,0 +1,19 @@
+--- configure.in.orig	2012-07-09 14:45:54.088864442 +0200
++++ configure.in	2012-07-09 14:46:55.868944948 +0200
+@@ -135,7 +135,6 @@
+             #include <libavcodec/avcodec.h>
+             #include <libswscale/swscale.h>
+             ]],[[
+-                avcodec_init();
+                 swscale_version();
+                 #ifdef FFMS_USE_FFMPEG_COMPAT
+                 int bogus = CODEC_ID_G2M;
+@@ -145,7 +144,7 @@
+         ])
+ 
+ AC_MSG_CHECKING([whether $_lav_name works])
+-LIBS="$_LIBS $LIBAV_LIBS"
++LIBS="$_LIBS $LIBAV_LIBS -lvpx"
+ TEST_LIBAV([LIBAV_WORKS])
+ AC_MSG_RESULT([$LIBAV_WORKS])
+ if test "$LIBAV_WORKS" = no; then
