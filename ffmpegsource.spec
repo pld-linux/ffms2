@@ -73,7 +73,7 @@ Statyczna biblioteka FFmpegSource.
 %prep
 %setup -q -n ffms-%{version}-src
 %patch0 -p0
-%patch0 -p1
+%patch1 -p1
 %undos src/core/{indexing,lavfindexer,utils}.cpp
 %{__rm} configure
 
