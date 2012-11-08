@@ -9,6 +9,7 @@ Group:		Libraries
 Source0:	http://ffmpegsource.googlecode.com/files/ffms-%{version}-src.tar.bz2
 # Source0-md5:	13770e29d5215ad4b68caad44b09da07
 Patch0:		%{name}-ffmpeg011.patch
+Patch1:		%{name}-ffmpeg10.patch
 URL:		http://code.google.com/p/ffmpegsource/
 BuildRequires:	autoconf >= 2.58
 BuildRequires:	automake
@@ -72,6 +73,7 @@ Statyczna biblioteka FFmpegSource.
 %prep
 %setup -q -n ffms-%{version}-src
 %patch0 -p0
+%patch0 -p1
 %undos src/core/{indexing,lavfindexer,utils}.cpp
 %{__rm} configure
 

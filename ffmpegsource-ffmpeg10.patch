@@ -1,0 +1,171 @@
+diff -ur ffms-2.17-src/src/core/codectype.cpp ffms-2.17-src-ffmpeg1.0/src/core/codectype.cpp
+--- ffms-2.17-src/src/core/codectype.cpp	2012-01-22 05:46:09.000000000 +0100
++++ ffms-2.17-src-ffmpeg1.0/src/core/codectype.cpp	2012-11-08 13:08:43.894100438 +0100
+@@ -25,7 +25,7 @@
+ 
+ typedef struct CodecTags {
+ 	char str[20];
+-	CodecID id;
++	AVCodecID id;
+ } CodecTags;
+ 
+ static const CodecTags mkv_codec_tags[] = {
+@@ -92,7 +92,7 @@
+ };
+ 
+ typedef struct AVCodecTag {
+-	enum CodecID id;
++	enum AVCodecID id;
+ 	unsigned int tag;
+ } AVCodecTag;
+ 
+@@ -400,7 +400,7 @@
+ 	}
+ }
+ 
+-CodecID MatroskaToFFCodecID(char *Codec, void *CodecPrivate, unsigned int FourCC, unsigned int BitsPerSample) {
++AVCodecID MatroskaToFFCodecID(char *Codec, void *CodecPrivate, unsigned int FourCC, unsigned int BitsPerSample) {
+ 	/* Look up native codecs */
+ 	for(int i = 0; mkv_codec_tags[i].id != CODEC_ID_NONE; i++){
+ 		if(!strncmp(mkv_codec_tags[i].str, Codec,
+@@ -408,7 +408,7 @@
+ 
+ 				// Uncompressed and exotic format fixup
+ 				// This list is incomplete
+-				CodecID CID = mkv_codec_tags[i].id;
++				AVCodecID CID = mkv_codec_tags[i].id;
+ 				switch (CID) {
+ 					case CODEC_ID_PCM_S16LE:
+ 						switch (BitsPerSample) {
+diff -ur ffms-2.17-src/src/core/codectype.h ffms-2.17-src-ffmpeg1.0/src/core/codectype.h
+--- ffms-2.17-src/src/core/codectype.h	2012-01-22 05:46:09.000000000 +0100
++++ ffms-2.17-src-ffmpeg1.0/src/core/codectype.h	2012-11-08 13:08:50.330766878 +0100
+@@ -27,5 +27,5 @@
+ #include "ffmscompat.h"
+ 
+ FFMS_TrackType HaaliTrackTypeToFFTrackType(int TT);
+-CodecID MatroskaToFFCodecID(char *Codec, void *CodecPrivate, unsigned int FourCC = 0, unsigned int BitsPerSample = 0);
++AVCodecID MatroskaToFFCodecID(char *Codec, void *CodecPrivate, unsigned int FourCC = 0, unsigned int BitsPerSample = 0);
+ const char *GetLAVCSampleFormatName(AVSampleFormat s);
+diff -ur ffms-2.17-src/src/core/matroskaaudio.cpp ffms-2.17-src-ffmpeg1.0/src/core/matroskaaudio.cpp
+--- ffms-2.17-src/src/core/matroskaaudio.cpp	2012-01-22 05:46:09.000000000 +0100
++++ ffms-2.17-src-ffmpeg1.0/src/core/matroskaaudio.cpp	2012-11-08 13:11:08.054095355 +0100
+@@ -45,7 +45,7 @@
+ 	CodecContext.reset(avcodec_alloc_context3(NULL), DeleteMatroskaCodecContext);
+ 	assert(CodecContext);
+ 
+-	AVCodec *Codec = avcodec_find_decoder(MatroskaToFFCodecID(TI->CodecID, TI->CodecPrivate, 0, TI->AV.Audio.BitDepth));
++	AVCodec *Codec = avcodec_find_decoder(MatroskaToFFCodecID(TI->MKVCodecID, TI->CodecPrivate, 0, TI->AV.Audio.BitDepth));
+ 	if (!Codec) {
+ 		mkv_Close(MF);
+ 		throw FFMS_Exception(FFMS_ERROR_DECODING, FFMS_ERROR_CODEC, "Audio codec not found");
+diff -ur ffms-2.17-src/src/core/matroskaindexer.cpp ffms-2.17-src-ffmpeg1.0/src/core/matroskaindexer.cpp
+--- ffms-2.17-src/src/core/matroskaindexer.cpp	2012-01-22 05:46:09.000000000 +0100
++++ ffms-2.17-src-ffmpeg1.0/src/core/matroskaindexer.cpp	2012-11-08 13:11:15.454095093 +0100
+@@ -50,7 +50,7 @@
+ 
+ 	for (unsigned int i = 0; i < mkv_GetNumTracks(MF); i++) {
+ 		TrackInfo *TI = mkv_GetTrackInfo(MF, i);
+-		Codec[i] = avcodec_find_decoder(MatroskaToFFCodecID(TI->CodecID, TI->CodecPrivate, 0, TI->AV.Audio.BitDepth));
++		Codec[i] = avcodec_find_decoder(MatroskaToFFCodecID(TI->MKVCodecID, TI->CodecPrivate, 0, TI->AV.Audio.BitDepth));
+ 	}
+ }
+ 
+diff -ur ffms-2.17-src/src/core/matroskaparser.c ffms-2.17-src-ffmpeg1.0/src/core/matroskaparser.c
+--- ffms-2.17-src/src/core/matroskaparser.c	2011-01-27 21:38:25.000000000 +0100
++++ ffms-2.17-src-ffmpeg1.0/src/core/matroskaparser.c	2012-11-08 13:12:09.934093171 +0100
+@@ -1366,9 +1366,9 @@
+       readLangCC(mf, len, t.Language);
+       break;
+     case 0x86: // CodecID
+-      if (t.CodecID)
++      if (t.MKVCodecID)
+ 	errorjmp(mf,"Duplicate CodecID");
+-      STRGETA(mf,t.CodecID,len);
++      STRGETA(mf,t.MKVCodecID,len);
+       break;
+     case 0x63a2: // CodecPrivate
+       if (cp)
+@@ -1459,7 +1459,7 @@
+   ENDFOR(mf);
+ 
+   // validate track info
+-  if (!t.CodecID)
++  if (!t.MKVCodecID)
+     errorjmp(mf,"Track has no Codec ID");
+ 
+   if (t.UID != 0) {
+@@ -1525,8 +1525,8 @@
+   // copy strings
+   if (t.Name)
+     cpadd += strlen(t.Name)+1;
+-  if (t.CodecID)
+-    cpadd += strlen(t.CodecID)+1;
++  if (t.MKVCodecID)
++    cpadd += strlen(t.MKVCodecID)+1;
+ 
+   tp = mf->cache->memalloc(mf->cache,sizeof(*tp) + cplen + cslen + cpadd);
+   if (tp == NULL)
+@@ -1546,7 +1546,7 @@
+ 
+   cp = (char*)(tp+1) + cplen + cslen;
+   CopyStr(&tp->Name,&cp);
+-  CopyStr(&tp->CodecID,&cp);
++  CopyStr(&tp->MKVCodecID,&cp);
+ 
+   // set default language
+   if (!tp->Language[0])
+@@ -1797,7 +1797,7 @@
+ 	    proc = ASGET(mf, ch, Process);
+ 	    memset(proc, 0, sizeof(*proc));
+ 	  }
+-	  proc->CodecID = (unsigned)readUInt(mf,(unsigned)len);
++	  proc->MKVCodecID = (unsigned)readUInt(mf,(unsigned)len);
+ 	  break;
+ 	case 0x450d: // ChapProcessPrivate
+ 	  if (proc == NULL) {
+diff -ur ffms-2.17-src/src/core/matroskaparser.h ffms-2.17-src-ffmpeg1.0/src/core/matroskaparser.h
+--- ffms-2.17-src/src/core/matroskaparser.h	2010-11-28 03:28:40.000000000 +0100
++++ ffms-2.17-src-ffmpeg1.0/src/core/matroskaparser.h	2012-11-08 13:10:59.050762337 +0100
+@@ -161,7 +161,7 @@
+   /* various strings */
+   char			*Name;
+   char			Language[4];
+-  char			*CodecID;
++  char			*MKVCodecID;
+ };
+ 
+ typedef struct TrackInfo  TrackInfo;
+@@ -208,7 +208,7 @@
+ };
+ 
+ struct ChapterProcess {
+-  unsigned		CodecID;
++  unsigned		MKVCodecID;
+   unsigned		CodecPrivateLength;
+   void			*CodecPrivate;
+   unsigned		nCommands,nCommandsSize;
+diff -ur ffms-2.17-src/src/core/matroskavideo.cpp ffms-2.17-src-ffmpeg1.0/src/core/matroskavideo.cpp
+--- ffms-2.17-src/src/core/matroskavideo.cpp	2012-01-22 05:46:09.000000000 +0100
++++ ffms-2.17-src-ffmpeg1.0/src/core/matroskavideo.cpp	2012-11-08 13:12:29.977425796 +0100
+@@ -71,7 +71,7 @@
+ 		CodecContext->thread_count = 1;
+ #endif
+ 
+-	Codec = avcodec_find_decoder(MatroskaToFFCodecID(TI->CodecID, TI->CodecPrivate));
++	Codec = avcodec_find_decoder(MatroskaToFFCodecID(TI->MKVCodecID, TI->CodecPrivate));
+ 	if (Codec == NULL)
+ 		throw FFMS_Exception(FFMS_ERROR_DECODING, FFMS_ERROR_CODEC,
+ 			"Video codec not found");
+diff -ur ffms-2.17-src/src/core/utils.cpp ffms-2.17-src-ffmpeg1.0/src/core/utils.cpp
+--- ffms-2.17-src/src/core/utils.cpp	2012-11-08 13:13:28.604090395 +0100
++++ ffms-2.17-src-ffmpeg1.0/src/core/utils.cpp	2012-11-08 13:12:54.737424924 +0100
+@@ -256,7 +256,7 @@
+ 	uint8_t *PrivateDataSrc = static_cast<uint8_t *>(TI->CodecPrivate);
+ 	size_t PrivateDataSize = TI->CodecPrivateSize;
+ 	size_t BIHSize = sizeof(FFMS_BITMAPINFOHEADER); // 40 bytes
+-	if (!strncmp(TI->CodecID, "V_MS/VFW/FOURCC", 15) && PrivateDataSize >= BIHSize) {
++	if (!strncmp(TI->MKVCodecID, "V_MS/VFW/FOURCC", 15) && PrivateDataSize >= BIHSize) {
+ 		// For some reason UTVideo requires CodecContext->codec_tag (i.e. the FourCC) to be set.
+ 		// Fine, it can't hurt to set it, so let's go find it.
+ 		// In a V_MS/VFW/FOURCC track, the codecprivate starts with a BITMAPINFOHEADER. If you treat that struct
