@@ -2,7 +2,7 @@ Summary:	FFmpegSource - FFmpeg wrapper library
 Summary(pl.UTF-8):	FFmpegSource - biblioteka obudowująca FFmpeg
 Name:		ffmpegsource
 Version:	2.17
-Release:	3
+Release:	4
 License:	MIT (ffmpegsource itself), GPL v3+ (forced by ffmpeg)
 Group:		Libraries
 #Source0Download: http://code.google.com/p/ffmpegsource/downloads/list
@@ -10,6 +10,7 @@ Source0:	http://ffmpegsource.googlecode.com/files/ffms-%{version}-src.tar.bz2
 # Source0-md5:	13770e29d5215ad4b68caad44b09da07
 Patch0:		%{name}-ffmpeg011.patch
 Patch1:		%{name}-ffmpeg10.patch
+Patch2:		%{name}-am.patch
 URL:		http://code.google.com/p/ffmpegsource/
 BuildRequires:	autoconf >= 2.58
 BuildRequires:	automake
@@ -74,6 +75,7 @@ Statyczna biblioteka FFmpegSource.
 %setup -q -n ffms-%{version}-src
 %patch0 -p0
 %patch1 -p1
+%patch2 -p1
 %undos src/core/{indexing,lavfindexer,utils}.cpp
 %{__rm} configure
 
@@ -87,6 +89,7 @@ Statyczna biblioteka FFmpegSource.
 %configure \
 	--enable-shared
 
+# V=1 to disable shave silent mode
 %{__make} \
 	V=1
 
