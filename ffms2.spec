@@ -1,18 +1,18 @@
+#
+# Conditional build:
+%bcond_without	static_libs	# don't build static libraries
+
 Summary:	FFmpegSource - FFmpeg wrapper library
 Summary(pl.UTF-8):	FFmpegSource - biblioteka obudowująca FFmpeg
-Name:		ffmpegsource
-Version:	2.17
-Release:	6
+Name:		ffms2
+Version:	2.20
+Release:	1
 License:	MIT (ffmpegsource itself), GPL v3+ (forced by ffmpeg)
 Group:		Libraries
-#Source0Download: http://code.google.com/p/ffmpegsource/downloads/list
-Source0:	http://ffmpegsource.googlecode.com/files/ffms-%{version}-src.tar.bz2
-# Source0-md5:	13770e29d5215ad4b68caad44b09da07
-Patch0:		%{name}-ffmpeg011.patch
-Patch1:		%{name}-ffmpeg10.patch
-Patch2:		%{name}-ffmpeg12.patch
-Patch3:		%{name}-am.patch
-URL:		http://code.google.com/p/ffmpegsource/
+Source0:	https://github.com/FFMS/ffms2/archive/%{version}/%{name}-%{version}.tar.gz
+# Source0-md5:	d6f2faa9e0ffed2e2d8d926592a87744
+Patch0:		ffmpegsource-ffmpeg011.patch
+URL:		https://github.com/FFMS/ffms2
 BuildRequires:	autoconf >= 2.58
 BuildRequires:	automake
 # libavformat >= 52.64.2 libavcodec >= 52.72.0 libswscale >= 0.7.0 libavutil >= 50.15.1
@@ -24,6 +24,7 @@ BuildRequires:	pkgconfig >= 1:0.22
 BuildRequires:	rpmbuild(macros) >= 1.566
 BuildRequires:	sed >= 4.0
 BuildRequires:	zlib-devel
+Obsoletes:	ffmpegsource < 2.20
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -42,8 +43,8 @@ biblioteka obudowująca FFmpeg wraz z paroma dodatkowymi komponentami
 mającymi radzić sobie z formatami plików, z którymi libavformat z
 FFmpeg ma (lub miał) problemy. Umożliwia w łatwy sposób zażądanie
 "otwórz i zdekompresuj ten plik, nieważne jak" i uzyskanie dostępu
-(zwykle) z dokładnością do ramek i próbek, bez potrzeby zajmowania
-się często złożonym, nie najlepiej udokumentowanym API FFmpeg.
+(zwykle) z dokładnością do ramek i próbek, bez potrzeby zajmowania się
+często złożonym, nie najlepiej udokumentowanym API FFmpeg.
 
 %package devel
 Summary:	Header files for FFmpegSource library
@@ -53,6 +54,8 @@ Requires:	%{name} = %{version}-%{release}
 Requires:	ffmpeg-devel >= 0.9
 Requires:	libstdc++-devel
 Requires:	zlib-devel
+Provides:	ffmpegsource-devel = %{version}-%{release}
+Obsoletes:	ffmpegsource-devel < 2.20
 
 %description devel
 Header files for FFmpegSource library.
@@ -65,6 +68,7 @@ Summary:	Static FFmpegSource library
 Summary(pl.UTF-8):	Statyczna biblioteka FFmpegSource
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
+Obsoletes:	ffmpegsource-static < 2.20
 
 %description static
 Static FFmpegSource library.
@@ -73,11 +77,8 @@ Static FFmpegSource library.
 Statyczna biblioteka FFmpegSource.
 
 %prep
-%setup -q -n ffms-%{version}-src
+%setup -q
 %patch0 -p0
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
 %undos src/core/{indexing,lavfindexer,utils}.cpp
 %{__rm} configure
 
@@ -87,19 +88,19 @@ Statyczna biblioteka FFmpegSource.
 %{__autoconf}
 %{__autoheader}
 %{__automake}
-
 %configure \
+	--disable-silent-rules \
+	%{__enable_disable static_libs static} \
 	--enable-shared
 
-# V=1 to disable shave silent mode
-%{__make} \
-	V=1
+%{__make}
 
 %install
 rm -rf $RPM_BUILD_ROOT
-
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
+
+%{__rm} -r $RPM_BUILD_ROOT%{_docdir}/%{name}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -112,7 +113,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc COPYING
 %attr(755,root,root) %{_bindir}/ffmsindex
 %attr(755,root,root) %{_libdir}/libffms2.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libffms2.so.2
+%attr(755,root,root) %ghost %{_libdir}/libffms2.so.3
 
 %files devel
 %defattr(644,root,root,755)
@@ -123,6 +124,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ffmscompat.h
 %{_pkgconfigdir}/ffms2.pc
 
+%if %{with static_libs}
 %files static
 %defattr(644,root,root,755)
 %{_libdir}/libffms2.a
+%endif

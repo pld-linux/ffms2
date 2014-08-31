@@ -1,13 +1,5 @@
---- configure.in.orig	2012-07-09 14:45:54.088864442 +0200
-+++ configure.in	2012-07-09 14:46:55.868944948 +0200
-@@ -135,7 +135,6 @@
-             #include <libavcodec/avcodec.h>
-             #include <libswscale/swscale.h>
-             ]],[[
--                avcodec_init();
-                 swscale_version();
-                 #ifdef FFMS_USE_FFMPEG_COMPAT
-                 int bogus = CODEC_ID_G2M;
+--- configure.ac.orig	2012-07-09 14:45:54.088864442 +0200
++++ configure.ac	2012-07-09 14:46:55.868944948 +0200
 @@ -145,7 +144,7 @@
          ])
  
