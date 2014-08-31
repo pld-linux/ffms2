@@ -15,7 +15,7 @@ Patch0:		ffmpegsource-ffmpeg011.patch
 URL:		https://github.com/FFMS/ffms2
 BuildRequires:	autoconf >= 2.58
 BuildRequires:	automake
-# libavformat >= 52.64.2 libavcodec >= 52.72.0 libswscale >= 0.7.0 libavutil >= 50.15.1
+# PKG_CHECK_MODULES(LIBAV, [libavformat >= 53.20.0 libavcodec >= 53.24.0 libswscale >= 0.7.0 libavutil >= 51.21.0 ])
 BuildRequires:	ffmpeg-devel >= 0.9
 BuildRequires:	libstdc++-devel
 BuildRequires:	libtool >= 2:2.0
@@ -83,6 +83,7 @@ Statyczna biblioteka FFmpegSource.
 %{__rm} configure
 
 %build
+CXXFLAGS="%{rpmcxxflags} -Wall -Wextra -Wno-missing-field-initializers -Werror"
 %{__libtoolize}
 %{__aclocal} -I m4
 %{__autoconf}
