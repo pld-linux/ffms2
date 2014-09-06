@@ -1,6 +1,7 @@
 #
 # Conditional build:
 %bcond_without	static_libs	# don't build static libraries
+%bcond_without	avresample	# avresample support via libavresample
 
 Summary:	FFmpegSource - FFmpeg wrapper library
 Summary(pl.UTF-8):	FFmpegSource - biblioteka obudowująca FFmpeg
@@ -14,12 +15,13 @@ Source0:	https://github.com/FFMS/ffms2/archive/%{version}/%{name}-%{version}.tar
 Patch0:		ffmpegsource-ffmpeg011.patch
 URL:		https://github.com/FFMS/ffms2
 BuildRequires:	autoconf >= 2.58
-BuildRequires:	automake
+BuildRequires:	automake >= 1:1.11
 # PKG_CHECK_MODULES(LIBAV, [libavformat >= 53.20.0 libavcodec >= 53.24.0 libswscale >= 0.7.0 libavutil >= 51.21.0 ])
 BuildRequires:	ffmpeg-devel >= 0.9
+# libavresample >= 1.0.0
+%{?with_avresample:BuildRequires:	ffmpeg-devel >= 1.1}
 BuildRequires:	libstdc++-devel
 BuildRequires:	libtool >= 2:2.0
-BuildRequires:	p7zip
 BuildRequires:	pkgconfig >= 1:0.22
 BuildRequires:	rpmbuild(macros) >= 1.566
 BuildRequires:	sed >= 4.0
@@ -51,7 +53,11 @@ Summary:	Header files for FFmpegSource library
 Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki FFmpegSource
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
+%if %{with avresample}
+Requires:	ffmpeg-devel >= 1.1
+%else
 Requires:	ffmpeg-devel >= 0.9
+%endif
 Requires:	libstdc++-devel
 Requires:	zlib-devel
 Provides:	ffmpegsource-devel = %{version}-%{release}
@@ -90,9 +96,10 @@ CXXFLAGS="%{rpmcxxflags} -Wall -Wextra -Wno-missing-field-initializers -Werror"
 %{__autoheader}
 %{__automake}
 %configure \
+	--enable-avresample%{!?with_avresample:=no} \
 	--disable-silent-rules \
-	%{__enable_disable static_libs static} \
-	--enable-shared
+	--enable-shared \
+	%{__enable_disable static_libs static}
 
 %{__make}
 
@@ -111,7 +118,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc COPYING
+%doc COPYING README.md
 %attr(755,root,root) %{_bindir}/ffmsindex
 %attr(755,root,root) %{_libdir}/libffms2.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libffms2.so.3
