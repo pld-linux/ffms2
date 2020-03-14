@@ -6,21 +6,19 @@
 Summary:	FFmpegSource - FFmpeg wrapper library
 Summary(pl.UTF-8):	FFmpegSource - biblioteka obudowująca FFmpeg
 Name:		ffms2
-Version:	2.20
-Release:	5
+Version:	2.23
+Release:	1
 License:	MIT (ffmpegsource itself), GPL v3+ (forced by ffmpeg)
 Group:		Libraries
+#Source0Download: https://github.com/FFMS/ffms2/releases
 Source0:	https://github.com/FFMS/ffms2/archive/%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	d6f2faa9e0ffed2e2d8d926592a87744
-Patch0:		ffmpegsource-ffmpeg011.patch
-Patch1:		ffmpeg3.patch
-Patch2:		ffmpeg4.patch
+# Source0-md5:	e7728ae581e278ade6bc9f204faaff9e
 URL:		https://github.com/FFMS/ffms2
 BuildRequires:	autoconf >= 2.58
 BuildRequires:	automake >= 1:1.11
 # PKG_CHECK_MODULES(LIBAV, [libavformat >= 53.20.0 libavcodec >= 53.24.0 libswscale >= 0.7.0 libavutil >= 51.21.0 ])
 BuildRequires:	ffmpeg-devel >= 0.9
-# libavresample >= 1.0.0
+# libavresample >= 1.0.0 or libswresample >= 1.0.0
 %{?with_avresample:BuildRequires:	ffmpeg-devel >= 1.1}
 BuildRequires:	libstdc++-devel
 BuildRequires:	libtool >= 2:2.0
@@ -86,14 +84,9 @@ Statyczna biblioteka FFmpegSource.
 
 %prep
 %setup -q
-%patch0 -p0
-%patch1 -p1
-%patch2 -p1
-%undos src/core/{indexing,lavfindexer,utils}.cpp
-%{__rm} configure
 
 %build
-CXXFLAGS="%{rpmcxxflags} -Wall -Wextra -Wno-missing-field-initializers"
+CXXFLAGS="%{rpmcxxflags} -Wall -Wextra"
 %{__libtoolize}
 %{__aclocal} -I m4
 %{__autoconf}
@@ -109,8 +102,12 @@ CXXFLAGS="%{rpmcxxflags} -Wall -Wextra -Wno-missing-field-initializers"
 
 %install
 rm -rf $RPM_BUILD_ROOT
+
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
+
+# obsoleted by pkg-config
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/libffms2.la
 
 %{__rm} -r $RPM_BUILD_ROOT%{_docdir}/%{name}
 
@@ -125,13 +122,12 @@ rm -rf $RPM_BUILD_ROOT
 %doc COPYING README.md
 %attr(755,root,root) %{_bindir}/ffmsindex
 %attr(755,root,root) %{_libdir}/libffms2.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libffms2.so.3
+%attr(755,root,root) %ghost %{_libdir}/libffms2.so.4
 
 %files devel
 %defattr(644,root,root,755)
-%doc doc/*.{html,css}
+%doc doc/ffms2-*.md
 %attr(755,root,root) %{_libdir}/libffms2.so
-%{_libdir}/libffms2.la
 %{_includedir}/ffms.h
 %{_includedir}/ffmscompat.h
 %{_pkgconfigdir}/ffms2.pc
