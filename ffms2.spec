@@ -6,13 +6,13 @@
 Summary:	FFmpegSource - FFmpeg wrapper library
 Summary(pl.UTF-8):	FFmpegSource - biblioteka obudowująca FFmpeg
 Name:		ffms2
-Version:	2.23
+Version:	2.40
 Release:	1
 License:	MIT (ffmpegsource itself), GPL v3+ (forced by ffmpeg)
 Group:		Libraries
 #Source0Download: https://github.com/FFMS/ffms2/releases
 Source0:	https://github.com/FFMS/ffms2/archive/%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	e7728ae581e278ade6bc9f204faaff9e
+# Source0-md5:	141f194432d70bbf5456a847043f332a
 URL:		https://github.com/FFMS/ffms2
 BuildRequires:	autoconf >= 2.58
 BuildRequires:	automake >= 1:1.11
@@ -84,6 +84,8 @@ Statyczna biblioteka FFmpegSource.
 
 %prep
 %setup -q
+
+install -d src/config
 
 %build
 CXXFLAGS="%{rpmcxxflags} -Wall -Wextra"
