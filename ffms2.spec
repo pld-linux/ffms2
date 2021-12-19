@@ -20,10 +20,13 @@ BuildRequires:	automake >= 1:1.11
 BuildRequires:	ffmpeg-devel >= 0.9
 # libavresample >= 1.0.0 or libswresample >= 1.0.0
 %{?with_avresample:BuildRequires:	ffmpeg-devel >= 1.1}
+%ifarch %{armv6}
+BuildRequires:	libatomic-devel
+%endif
 BuildRequires:	libstdc++-devel
 BuildRequires:	libtool >= 2:2.0
 BuildRequires:	pkgconfig >= 1:0.22
-BuildRequires:	rpmbuild(macros) >= 1.566
+BuildRequires:	rpmbuild(macros) >= 2.007
 BuildRequires:	sed >= 4.0
 BuildRequires:	zlib-devel
 Obsoletes:	ffmpegsource < 2.20
@@ -95,6 +98,9 @@ CXXFLAGS="%{rpmcxxflags} -Wall -Wextra"
 %{__autoheader}
 %{__automake}
 %configure \
+%ifarch %{armv6}
+	LIBS=-latomic \
+%endif
 	--enable-avresample%{!?with_avresample:=no} \
 	--disable-silent-rules \
 	--enable-shared \
