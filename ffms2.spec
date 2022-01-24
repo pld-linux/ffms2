@@ -13,6 +13,7 @@ Group:		Libraries
 #Source0Download: https://github.com/FFMS/ffms2/releases
 Source0:	https://github.com/FFMS/ffms2/archive/%{version}/%{name}-%{version}.tar.gz
 # Source0-md5:	141f194432d70bbf5456a847043f332a
+Patch0:		ffmpeg5.patch
 URL:		https://github.com/FFMS/ffms2
 BuildRequires:	autoconf >= 2.58
 BuildRequires:	automake >= 1:1.11
@@ -87,6 +88,7 @@ Statyczna biblioteka FFmpegSource.
 
 %prep
 %setup -q
+%patch0 -p1
 
 install -d src/config
 
