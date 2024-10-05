@@ -1,26 +1,22 @@
 #
 # Conditional build:
-%bcond_without	static_libs	# don't build static libraries
-%bcond_without	avresample	# avresample support via libavresample
+%bcond_without	static_libs	# static library
 
 Summary:	FFmpegSource - FFmpeg wrapper library
 Summary(pl.UTF-8):	FFmpegSource - biblioteka obudowująca FFmpeg
 Name:		ffms2
-Version:	2.40
-Release:	2
+Version:	5.0
+Release:	1
 License:	MIT (ffmpegsource itself), GPL v3+ (forced by ffmpeg)
 Group:		Libraries
 #Source0Download: https://github.com/FFMS/ffms2/releases
 Source0:	https://github.com/FFMS/ffms2/archive/%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	141f194432d70bbf5456a847043f332a
-Patch0:		ffmpeg5.patch
+# Source0-md5:	c90259950777de3c429a78038a6a00a3
 URL:		https://github.com/FFMS/ffms2
 BuildRequires:	autoconf >= 2.58
 BuildRequires:	automake >= 1:1.11
-# PKG_CHECK_MODULES(LIBAV, [libavformat >= 53.20.0 libavcodec >= 53.24.0 libswscale >= 0.7.0 libavutil >= 51.21.0 ])
-BuildRequires:	ffmpeg-devel >= 0.9
-# libavresample >= 1.0.0 or libswresample >= 1.0.0
-%{?with_avresample:BuildRequires:	ffmpeg-devel >= 1.1}
+# libavformat >= 60.16.0 libavcodec >= 60.31.0 libswscale >= 7.5.0 libavutil >= 58.29.0 libswresample >= 4.12.0
+BuildRequires:	ffmpeg-devel >= 6.1
 %ifarch %{armv6}
 BuildRequires:	libatomic-devel
 %endif
@@ -57,11 +53,7 @@ Summary:	Header files for FFmpegSource library
 Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki FFmpegSource
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
-%if %{with avresample}
-Requires:	ffmpeg-devel >= 1.1
-%else
-Requires:	ffmpeg-devel >= 0.9
-%endif
+Requires:	ffmpeg-devel >= 6.1
 Requires:	libstdc++-devel
 Requires:	zlib-devel
 Provides:	ffmpegsource-devel = %{version}-%{release}
@@ -88,7 +80,6 @@ Statyczna biblioteka FFmpegSource.
 
 %prep
 %setup -q
-%patch0 -p1
 
 install -d src/config
 
@@ -103,7 +94,6 @@ CXXFLAGS="%{rpmcxxflags} -Wall -Wextra"
 %ifarch %{armv6}
 	LIBS=-latomic \
 %endif
-	--enable-avresample%{!?with_avresample:=no} \
 	--disable-silent-rules \
 	--enable-shared \
 	%{__enable_disable static_libs static}
@@ -132,7 +122,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc COPYING README.md
 %attr(755,root,root) %{_bindir}/ffmsindex
 %attr(755,root,root) %{_libdir}/libffms2.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libffms2.so.4
+%attr(755,root,root) %ghost %{_libdir}/libffms2.so.5
 
 %files devel
 %defattr(644,root,root,755)
