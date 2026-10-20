@@ -6,7 +6,7 @@ Summary:	FFmpegSource - FFmpeg wrapper library
 Summary(pl.UTF-8):	FFmpegSource - biblioteka obudowująca FFmpeg
 Name:		ffms2
 Version:	5.0
-Release:	3
+Release:	4
 License:	MIT (ffmpegsource itself), GPL v3+ (forced by ffmpeg)
 Group:		Libraries
 #Source0Download: https://github.com/FFMS/ffms2/releases
